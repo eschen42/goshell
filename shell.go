@@ -65,12 +65,12 @@ type Command struct {
 	args []string
 	in   *Command
 	wd   string
-	log  bool
+	Log  bool
 }
 
 func (c *Command) ProcFn() func(...interface{}) *Process {
 	return func(args ...interface{}) *Process {
-		cmd := &Command{c.args, c.in, c.wd, c.log}
+		cmd := &Command{c.args, c.in, c.wd, c.Log}
 		cmd.addArgs(args...)
 		return cmd.Run()
 	}
@@ -78,7 +78,7 @@ func (c *Command) ProcFn() func(...interface{}) *Process {
 
 func (c *Command) OutputFn() func(...interface{}) (string, error) {
 	return func(args ...interface{}) (out string, err error) {
-		cmd := &Command{c.args, c.in, c.wd, c.log}
+		cmd := &Command{c.args, c.in, c.wd, c.Log}
 		cmd.addArgs(args...)
 		defer func() {
 			if p, ok := recover().(*Process); p != nil {
@@ -96,7 +96,7 @@ func (c *Command) OutputFn() func(...interface{}) (string, error) {
 
 func (c *Command) ErrFn() func(...interface{}) error {
 	return func(args ...interface{}) (err error) {
-		cmd := &Command{c.args, c.in, c.wd, c.log}
+		cmd := &Command{c.args, c.in, c.wd, c.Log}
 		cmd.addArgs(args...)
 		defer func() {
 			if p, ok := recover().(*Process); p != nil {
@@ -179,7 +179,7 @@ func (c *Command) execute(cmd *exec.Cmd, call func() error) *Process {
 		fmt.Fprintln(os.Stderr, TracePrefix, c.shellCmd(false))
 	}
 	cmd.Dir = c.wd
-	if c.log {
+	if c.Log {
 		log.Println(cmd.Args)
 	}
 	p := new(Process)
@@ -223,7 +223,7 @@ func (c *Command) execute(cmd *exec.Cmd, call func() error) *Process {
 
 func Cmd(cmd ...interface{}) *Command {
 	c := new(Command)
-	c.log = false
+	c.Log = false
 	c.addArgs(cmd...)
 	return c
 }
