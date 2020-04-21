@@ -1,4 +1,9 @@
-package shell
+// Adapted by Art Eschenlauer (2020) from:
+//   https://github.com/progrium/go-shell/blob/master/shell.go
+// by Jeff Lindsay (2015)
+// License: MIT
+
+package goshell
 
 import (
 	"bytes"
@@ -8,12 +13,15 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+  "runtime"
 	"strings"
 	"syscall"
 )
 
 var (
-	Shell       = []string{"/bin/sh", "-c"}
+	Shell       = []string{"", ""}
+  shellInit   = false
+  goos        = "unknown"
 	Panic       = true
 	Trace       = false
 	TracePrefix = "+"
@@ -145,6 +153,18 @@ func (c *Command) shellCmd(quote bool) string {
 }
 
 func (c *Command) Run() *Process {
+  if !shellInit {
+    goos = runtime.GOOS
+    if goos == "windows" {
+        Shell = []string{"cmd", "/c"}
+    } else if goos == "linux"{
+        Shell = []string{"/bin/sh", "-c"}
+    } else {
+        fmt.Println("Panicking! Unknown OS")
+        panic(fmt.Sprintf("%s", runtime.GOOS))
+    }
+    shellInit = true
+  }
 	cmd := exec.Command(Shell[0], append(Shell[1:], c.shellCmd(false))...)
 	return c.execute(cmd, cmd.Run)
 }
