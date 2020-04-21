@@ -13,20 +13,19 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-  "runtime"
+	"runtime"
 	"strings"
 	"syscall"
 )
 
 var (
 	Shell       = []string{"", ""}
-  shellInit   = false
-  goos        = "unknown"
+	shellInit   = false
+	goos        = "unknown"
 	Panic       = true
 	Trace       = false
 	TracePrefix = "+"
-
-	exit = os.Exit
+	exit        = os.Exit
 )
 
 var Tee io.Writer
@@ -154,18 +153,18 @@ func (c *Command) shellCmd(quote bool) string {
 }
 
 func (c *Command) Run() *Process {
-  if !shellInit {
-    goos = runtime.GOOS
-    if goos == "windows" {
-        Shell = []string{"cmd", "/c"}
-    } else if goos == "linux"{
-        Shell = []string{"/bin/sh", "-c"}
-    } else {
-        fmt.Println("Panicking! Unknown OS")
-        panic(fmt.Sprintf("%s", runtime.GOOS))
-    }
-    shellInit = true
-  }
+	if !shellInit {
+		goos = runtime.GOOS
+		if goos == "windows" {
+			Shell = []string{"cmd", "/c"}
+		} else if goos == "linux" {
+			Shell = []string{"/bin/sh", "-c"}
+		} else {
+			fmt.Println("Panicking! Unknown OS")
+			panic(fmt.Sprintf("%s", runtime.GOOS))
+		}
+		shellInit = true
+	}
 	cmd := exec.Command(Shell[0], append(Shell[1:], c.shellCmd(false))...)
 	return c.execute(cmd, cmd.Run)
 }
@@ -302,4 +301,5 @@ func Run(cmd ...interface{}) *Process {
 func Start(cmd ...interface{}) *Process {
 	return Cmd(cmd...).Start()
 }
-//vim: sw=4 ts=4 noet :
+
+//vim: sw=8 ts=8 noet :
